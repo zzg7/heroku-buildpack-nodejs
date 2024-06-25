@@ -86,7 +86,12 @@ write_profile() {
   local bp_dir="$1"
   local build_dir="$2"
   mkdir -p "$build_dir/.profile.d"
-  cp "$bp_dir"/profile/* "$build_dir/.profile.d/"
+  local restore_extglob
+  restore_extglob=$(shopt -p extglob) # will return "shopt -u extglob" (or "-s")
+  cp "$bp_dir"/profile/!(WEB_CONCURRENCY.sh) "$build_dir/.profile.d/"
+  $restore_extglob
+  # concatenate these two together
+  cat "$bp_dir"/etc/cgroups.sh "$bp_dir"/profile/WEB_CONCURRENCY.sh > "$build_dir/.profile.d/WEB_CONCURRENCY.sh"
 }
 
 write_ci_profile() {
